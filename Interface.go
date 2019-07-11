@@ -112,6 +112,19 @@ func (compiler *Compiler) FilterTags(tags []string) *Compiler {
 	return compiler
 }
 
+// RenameClasses renames all classes as specified in renamingMap
+func (compiler *Compiler) RenameClasses() *RenamingMap {
+	renamingMap := NewRenamingMap()
+	renameClasses(compiler.rules, renamingMap)
+	for _, group := range compiler.mediaGroups {
+		renameClasses(group.Rules, renamingMap)
+	}
+	for _, query := range compiler.mediaQueries {
+		renameClasses(query.Rules, renamingMap)
+	}
+	return renamingMap
+}
+
 // Compile compiles the given scarlet code to a CSS string.
 func Compile(src string, pretty bool) (string, error) {
 	tree, err := codetree.New(src)

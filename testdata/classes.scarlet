@@ -1,0 +1,8 @@
+.class
+
+  .class-foo
+    font-weight bold
+
+  .class-bar
+    font-style italic
+
