@@ -13,7 +13,7 @@ var _ Renderable = (*CSSRule)(nil)
 
 // CSSRule ...
 type CSSRule struct {
-	Selector   string
+	Selector
 	Statements []*CSSStatement
 	Duplicates []*CSSRule
 	Parent     *CSSRule
@@ -107,41 +107,17 @@ func (rule *CSSRule) Copy() *CSSRule {
 // SelectorPath returns the selector string for the rule (recursive, returns absolute path).
 func (rule *CSSRule) SelectorPath(pretty bool) string {
 	if rule.Parent == nil {
-		return rule.Selector
+		return rule.Selector.Render()
 	}
 
 	// Parent path
 	fullPath := strings.Builder{}
 	fullPath.WriteString(rule.Parent.SelectorPath(pretty))
 
-	// Whitespace if needed
-	switch rule.Selector[0] {
-	case '|':
+	if rule.Selector[0].Type == ElementSelector {
 		fullPath.WriteString(" ")
-		fullPath.WriteString(rule.Selector[1:])
-
-	case '&':
-		fullPath.WriteString(rule.Selector[1:])
-
-	case '[':
-		fullPath.WriteString(rule.Selector)
-
-	case ':':
-		fullPath.WriteString(rule.Selector)
-
-	case '>':
-		if pretty {
-			fullPath.WriteString(" ")
-			fullPath.WriteString(rule.Selector)
-		} else {
-			fullPath.WriteString(">")
-			fullPath.WriteString(strings.TrimSpace(rule.Selector[1:]))
-		}
-
-	default:
-		fullPath.WriteString(" ")
-		fullPath.WriteString(rule.Selector)
 	}
+	fullPath.WriteString(rule.Selector.Render())
 
 	return fullPath.String()
 }

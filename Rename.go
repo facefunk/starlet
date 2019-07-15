@@ -1,7 +1,6 @@
 package scarlet
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -69,15 +68,15 @@ func (r *RenamingMap) Assign(longID string) string {
 func renameClasses(rules []*CSSRule, renamingMap *RenamingMap) {
 	for _, rule := range rules {
 		renameClasses(rule.Duplicates, renamingMap)
-		for _, part := range parseSelector(rule.Selector) {
+		for _, part := range rule.Selector {
 			if part.Type != ClassSelector {
 				continue
 			}
-			parts := strings.Split(part.Name[1:], "-")
+			parts := strings.Split(part.Name, "-")
 			for p, part := range parts {
 				parts[p] = renamingMap.Assign(part)
 			}
-			part.Name = fmt.Sprintf(".%s", strings.Join(parts, "-"))
+			part.Name = strings.Join(parts, "-")
 		}
 	}
 }

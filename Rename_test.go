@@ -1,9 +1,9 @@
 package scarlet
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
+	"reflect"
 	"testing"
 
 	"github.com/aerogo/codetree"
@@ -22,21 +22,47 @@ func TestRename(t *testing.T) {
 	renamingMap := compiler.RenameClasses()
 	css, err := compiler.Render(false)
 	if err != nil {
-		fmt.Printf("Error compiling:%s", err)
+		t.Errorf("Error compiling:%s", err)
 		return
 	}
-	mapJSON, err := json.Marshal(renamingMap.Map)
-	if err != nil {
-		fmt.Printf("Error marshaling:%s", err)
-		return
+
+	wantedMap := &RenamingMap{
+		Map: map[string]string{
+			"class": "a",
+			"foo":   "b",
+			"bar":   "c",
+		},
+		Len: 3,
 	}
-	fmt.Printf("renamingMap:%s\n", mapJSON)
-	fmt.Print(css)
+
+	if !reflect.DeepEqual(renamingMap, wantedMap) {
+		t.Errorf("RenamingMap doesn't match: %#v != %#v", renamingMap, wantedMap)
+	}
+
+	/*
+		mapJSON, err := json.Marshal(renamingMap.Map)
+		if err != nil {
+			t.Errorf("Error marshaling:%s", err)
+			return
+		}
+		fmt.Printf("renamingMap:%s\n", mapJSON)
+	*/
+
+	//fmt.Print(css)
+	wantedCSS := ".a.a-b{font-weight:bold}.a.a-c{font-style:italic}"
+	if css != wantedCSS {
+		t.Errorf("CSS output doesn't match: %s != %s", css, wantedCSS)
+	}
+
 }
 
 func TestAssign(t *testing.T) {
 	m := NewRenamingMap()
+	a := ""
 	for i := 0; i < 1000; i++ {
-		t.Log(m.Assign(fmt.Sprintf("LongID%d", i)))
+		a = m.Assign(fmt.Sprintf("LongID%d", i))
+	}
+	if a != "aa1" {
+		t.Errorf("Last assigned class name was %s", a)
 	}
 }

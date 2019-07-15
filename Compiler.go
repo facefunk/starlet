@@ -20,7 +20,7 @@ func compileChildren(node *codetree.CodeTree, parent *CSSRule, state *State) ([]
 	var mediaGroups []*MediaGroup
 	var mediaQueries []*MediaQuery
 	var animations []*Animation
-	var selectorsOnPreviousLines []string
+	var selectorsOnPreviousLines []Selector
 
 	// Iterate over child nodes
 	for _, child := range node.Children {
@@ -33,7 +33,8 @@ func compileChildren(node *codetree.CodeTree, parent *CSSRule, state *State) ([]
 
 			// Selector on previous line
 			if strings.HasSuffix(child.Line, ",") {
-				selectorsOnPreviousLines = append(selectorsOnPreviousLines, child.Line[:len(child.Line)-1])
+				selector := parseSelector(child.Line[:len(child.Line)-1])
+				selectorsOnPreviousLines = append(selectorsOnPreviousLines, selector)
 				continue
 			}
 
@@ -133,15 +134,13 @@ func compileChildren(node *codetree.CodeTree, parent *CSSRule, state *State) ([]
 			continue
 		}
 
-		selectors := splitSelector(child.Line)
+		selectors := parseSelector(child.Line).Split()
 
 		// Append selectors from previous lines
 		selectors = append(selectors, selectorsOnPreviousLines...)
 		selectorsOnPreviousLines = selectorsOnPreviousLines[:0]
 
 		for _, selector := range selectors {
-			selector = strings.TrimSpace(selector)
-
 			// Child rule
 			rule := &CSSRule{
 				Selector: selector,
