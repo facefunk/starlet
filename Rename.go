@@ -68,7 +68,7 @@ func (r *RenamingMap) Assign(longID string) string {
 func renameClasses(rules []*CSSRule, renamingMap *RenamingMap) {
 	for _, rule := range rules {
 		renameClasses(rule.Duplicates, renamingMap)
-		for _, part := range rule.Selector {
+		for p, part := range rule.Selector {
 			if part.Type != ClassSelector {
 				continue
 			}
@@ -76,7 +76,7 @@ func renameClasses(rules []*CSSRule, renamingMap *RenamingMap) {
 			for p, part := range parts {
 				parts[p] = renamingMap.Assign(part)
 			}
-			part.Name = strings.Join(parts, "-")
+			rule.Selector[p].Name = strings.Join(parts, "-")
 		}
 	}
 }

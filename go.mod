@@ -10,4 +10,4 @@ require (
 	golang.org/x/sys v0.0.0-20190429190828-d89cdac9e872 // indirect
 )
 
-replace github.com/aerogo/codetree => github.com/facefunk/codetree v1.1.2-fcfnk.0
+replace github.com/aerogo/codetree => github.com/facefunk/codetree v1.1.2-fcfnk.1

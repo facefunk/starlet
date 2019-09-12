@@ -45,3 +45,28 @@ func TestParseSelector(t *testing.T) {
 		t.Errorf("Rendered selector %s != %s", renderedSelector, wantedSelector)
 	}
 }
+
+func TestParentSelector(t *testing.T) {
+	s1 := "div.class2"
+	s2 := ".class1 & .class3"
+	sel1 := parseSelector(s1)
+	sel2 := parseSelector(s2)
+	cs1, err := sel2.Prepend(sel1)
+	if err != nil {
+		t.Error(err)
+	}
+	r1 := cs1.Render()
+	if r1 != ".class1 div.class2 .class3" {
+		t.Errorf("Unexpected selector: %s", r1)
+	}
+
+	sel3 := parseSelector(s1)
+	cs2, err := sel3.Prepend(sel1)
+	if err != nil {
+		t.Error(err)
+	}
+	r2 := cs2.Render()
+	if r2 != "div.class2 div.class2" {
+		t.Errorf("Unexpected selector: %s", r1)
+	}
+}

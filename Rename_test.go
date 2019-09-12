@@ -39,17 +39,7 @@ func TestRename(t *testing.T) {
 		t.Errorf("RenamingMap doesn't match: %#v != %#v", renamingMap, wantedMap)
 	}
 
-	/*
-		mapJSON, err := json.Marshal(renamingMap.Map)
-		if err != nil {
-			t.Errorf("Error marshaling:%s", err)
-			return
-		}
-		fmt.Printf("renamingMap:%s\n", mapJSON)
-	*/
-
-	//fmt.Print(css)
-	wantedCSS := ".a.a-b{font-weight:bold}.a.a-c{font-style:italic}"
+	wantedCSS := ".a .a-b{font-weight:bold}.a .a-c{font-style:italic}"
 	if css != wantedCSS {
 		t.Errorf("CSS output doesn't match: %s != %s", css, wantedCSS)
 	}

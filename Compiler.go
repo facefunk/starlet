@@ -141,6 +141,15 @@ func compileChildren(node *codetree.CodeTree, parent *CSSRule, state *State) ([]
 		selectorsOnPreviousLines = selectorsOnPreviousLines[:0]
 
 		for _, selector := range selectors {
+
+			if selector != nil && parent != nil && parent.Selector != nil {
+				var err error
+				selector, err = selector.Prepend(parent.Selector)
+				if err != nil {
+					panic(err)
+				}
+			}
+
 			// Child rule
 			rule := &CSSRule{
 				Selector: selector,

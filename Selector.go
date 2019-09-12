@@ -11,10 +11,11 @@ const (
 	CombinatorSelector
 	SeparatorSelector
 	NamespaceSelector
+	ParentSelector
 )
 
 type (
-	Selector     []*SelectorPart
+	Selector     []SelectorPart
 	SelectorPart struct {
 		Name     string
 		Type     int
@@ -37,7 +38,7 @@ func parseSelector(selector string) Selector {
 
 	add := func() {
 		if len(name) != 0 || t != ElementSelector {
-			parts = append(parts, &SelectorPart{
+			parts = append(parts, SelectorPart{
 				Name:     string(name),
 				Type:     t,
 				Operator: o,
@@ -47,7 +48,9 @@ func parseSelector(selector string) Selector {
 		o = c
 	}
 
+	// Combinator operator, trailing spaces are meaningless
 	combinator := func(nextT int) {
+		// Consume trailing spaces
 		for {
 			j := i + 1
 			if j == l || selector[j] != ' ' {
@@ -55,9 +58,12 @@ func parseSelector(selector string) Selector {
 			}
 			i = j
 		}
+		// Add previous part
 		add()
 		t = nextT
+		// Add combinator
 		add()
+		// Reset
 		t = ElementSelector
 		o = 0
 	}
@@ -69,6 +75,13 @@ func parseSelector(selector string) Selector {
 			combinator(SeparatorSelector)
 		case ' ', '>', '+', '~':
 			combinator(CombinatorSelector)
+		case '&':
+			// Not a combinator, trailing spaces are meaningful
+			add()
+			t = ParentSelector
+			add()
+			t = ElementSelector
+			o = 0
 		case '.':
 			add()
 			t = ClassSelector
@@ -114,16 +127,45 @@ func parseSelector(selector string) Selector {
 	return parts
 }
 
+func (selector Selector) Prepend(parent Selector) (Selector, error) {
+
+	if parent == nil || len(parent) == 0 {
+		return selector, nil
+	}
+
+	out := make(Selector, 0, len(selector)+len(parent)+1)
+	found := false
+	for _, part := range selector {
+		switch part.Type {
+		case ParentSelector:
+			out = append(out, parent...)
+			found = true
+		case SeparatorSelector:
+			return nil, fmt.Errorf("can't prepend unsplit selector: %s", selector.Render())
+		default:
+			out = append(out, part)
+		}
+	}
+
+	if !found {
+		ret := append(parent, SelectorPart{
+			Type:     CombinatorSelector,
+			Operator: ' ',
+		})
+		ret = append(ret, out...)
+		return ret, nil
+	}
+
+	return out, nil
+}
+
 func (selector Selector) Split() []Selector {
 	selectors := make([]Selector, 0, len(selector))
 	l := 0
-	p := 0
-	var part *SelectorPart
-	for p, part = range selector {
+	for p, part := range selector {
 		if part.Type == SeparatorSelector {
 			selectors = append(selectors, selector[l:p])
 			l = p + 1
-			continue
 		}
 	}
 	selectors = append(selectors, selector[l:])
