@@ -10,7 +10,9 @@ import (
 
 // compileChildren returns the CSS rules for a given code tree.
 // It iterates over the child nodes and finds the CSS rules.
-func compileChildren(node *codetree.CodeTree, parent *CSSRule, state *State) ([]*CSSRule, []*MediaGroup, []*MediaQuery, []*Animation) {
+func compileChildren(node *codetree.CodeTree, parent *CSSRule, state *State) (
+	[]*CSSRule, []*MediaGroup, []*MediaQuery, []*Animation) {
+
 	// Comments
 	if node.Type == codetree.CommentType {
 		return nil, nil, nil, nil
@@ -24,8 +26,20 @@ func compileChildren(node *codetree.CodeTree, parent *CSSRule, state *State) ([]
 
 	// Iterate over child nodes
 	for _, child := range node.Children {
-		// Nodes with no children
-		if len(child.Children) == 0 {
+
+		// Don't consider comments as valid children
+		hasChildren := false
+		if len(child.Children) > 0 {
+			for _, grandchild := range child.Children {
+				if grandchild.Type != codetree.CommentType {
+					hasChildren = true
+					break
+				}
+			}
+		}
+
+		// Nodes with no children are selectors on previous lines or statements of some sort
+		if !hasChildren {
 			// Comments
 			if child.Type == codetree.CommentType {
 				continue
@@ -33,8 +47,8 @@ func compileChildren(node *codetree.CodeTree, parent *CSSRule, state *State) ([]
 
 			// Selector on previous line
 			if strings.HasSuffix(child.Line, ",") {
-				selector := parseSelector(child.Line[:len(child.Line)-1])
-				selectorsOnPreviousLines = append(selectorsOnPreviousLines, selector)
+				selectors := parseSelector(child.Line[:len(child.Line)-1]).Split()
+				selectorsOnPreviousLines = append(selectorsOnPreviousLines, selectors...)
 				continue
 			}
 
@@ -65,6 +79,7 @@ func compileChildren(node *codetree.CodeTree, parent *CSSRule, state *State) ([]
 
 				if exists && parent != nil {
 					mixinRules := mixin.Apply(parent)
+					prependRules(parent, mixinRules...)
 					rules = append(rules, mixinRules...)
 				} else {
 					panic(fmt.Sprintf("invalid statement %s", child))
@@ -137,25 +152,16 @@ func compileChildren(node *codetree.CodeTree, parent *CSSRule, state *State) ([]
 		selectors := parseSelector(child.Line).Split()
 
 		// Append selectors from previous lines
-		selectors = append(selectors, selectorsOnPreviousLines...)
-		selectorsOnPreviousLines = selectorsOnPreviousLines[:0]
+		selectors = append(selectorsOnPreviousLines, selectors...)
+		selectorsOnPreviousLines = []Selector(nil)
 
-		for _, selector := range selectors {
-
-			if selector != nil && parent != nil && parent.Selector != nil {
-				var err error
-				selector, err = selector.Prepend(parent.Selector)
-				if err != nil {
-					panic(err)
-				}
-			}
-
+		for s := range selectors {
 			// Child rule
 			rule := &CSSRule{
-				Selector: selector,
+				Selector: selectors[s],
 				Parent:   parent,
 			}
-
+			prependRules(parent, rule)
 			rules = append(rules, rule)
 			childRules, childGroups, childQueries, childAnimations := compileChildren(child, rule, state)
 			rules = append(rules, childRules...)
@@ -166,6 +172,18 @@ func compileChildren(node *codetree.CodeTree, parent *CSSRule, state *State) ([]
 	}
 
 	return rules, mediaGroups, mediaQueries, animations
+}
+
+func prependRules(parent *CSSRule, rules ...*CSSRule) {
+	for _, rule := range rules {
+		if rule.Selector != nil && parent != nil && parent.Selector != nil && rule != parent {
+			var err error
+			rule.Selector, err = rule.Selector.Prepend(parent.Selector)
+			if err != nil {
+				panic(err)
+			}
+		}
+	}
 }
 
 // compileStatement compiles a Scarlet statement to CSS.

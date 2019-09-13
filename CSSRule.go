@@ -106,7 +106,7 @@ func (rule *CSSRule) Copy() *CSSRule {
 
 // SelectorPath returns the selector string for the rule (recursive, returns absolute path).
 func (rule *CSSRule) SelectorPath(pretty bool) string {
-	return rule.Selector.Render()
+	return rule.Selector.Render(pretty)
 }
 
 // StatementsHash returns a hash of all the statements which is used to find duplicate CSS rules.

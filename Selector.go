@@ -19,7 +19,7 @@ type (
 	SelectorPart struct {
 		Name     string
 		Type     int
-		Operator byte
+		Operator string
 	}
 )
 
@@ -30,7 +30,7 @@ func parseSelector(selector string) Selector {
 		parts Selector
 		t     int
 		c     byte
-		o     byte
+		o     string
 		i     int
 	)
 
@@ -45,7 +45,7 @@ func parseSelector(selector string) Selector {
 			})
 		}
 		name = name[:0]
-		o = c
+		o = string(c)
 	}
 
 	// Combinator operator, trailing spaces are meaningless
@@ -65,7 +65,7 @@ func parseSelector(selector string) Selector {
 		add()
 		// Reset
 		t = ElementSelector
-		o = 0
+		o = ""
 	}
 
 	for ; i < l; i++ {
@@ -81,7 +81,7 @@ func parseSelector(selector string) Selector {
 			t = ParentSelector
 			add()
 			t = ElementSelector
-			o = 0
+			o = ""
 		case '.':
 			add()
 			t = ClassSelector
@@ -104,21 +104,26 @@ func parseSelector(selector string) Selector {
 				name = append(name, c)
 			}
 		case ':':
+			element := false
 			for {
 				j := i + 1
 				if j == l || selector[j] != ':' {
 					break
 				}
 				i = j
+				element = true
 			}
 			add()
 			t = PseudoSelector
+			if element {
+				o = "::"
+			}
 		case '|':
 			t = NamespaceSelector
-			o = c
+			o = string(c)
 			add()
 			t = ElementSelector
-			o = 0
+			o = ""
 		default:
 			name = append(name, c)
 		}
@@ -141,16 +146,18 @@ func (selector Selector) Prepend(parent Selector) (Selector, error) {
 			out = append(out, parent...)
 			found = true
 		case SeparatorSelector:
-			return nil, fmt.Errorf("can't prepend unsplit selector: %s", selector.Render())
+			return nil, fmt.Errorf("can't prepend unsplit selector: %s", selector.Render(true))
 		default:
 			out = append(out, part)
 		}
 	}
 
 	if !found {
-		ret := append(parent, SelectorPart{
+		// Make sure to copy parent so as not to return duplicate pointers
+		ret := append(Selector(nil), parent...)
+		ret = append(ret, SelectorPart{
 			Type:     CombinatorSelector,
-			Operator: ' ',
+			Operator: " ",
 		})
 		ret = append(ret, out...)
 		return ret, nil
@@ -172,7 +179,7 @@ func (selector Selector) Split() []Selector {
 	return selectors
 }
 
-func (selector Selector) Render() string {
+func (selector Selector) Render(pretty bool) string {
 	out := ""
 	if len(selector) == 0 {
 		return out
@@ -188,9 +195,25 @@ func (selector Selector) Render() string {
 			out += fmt.Sprintf("%s|", part.Name)
 		case ElementSelector:
 			out += part.Name
+		case SeparatorSelector:
+			if !pretty {
+				out += string(part.Operator)
+				continue
+			}
+			out += fmt.Sprintf("%s ", part.Operator)
+		case CombinatorSelector:
+			if part.Operator == " " || !pretty {
+				out += string(part.Operator)
+				continue
+			}
+			out += fmt.Sprintf(" %s", part.Operator)
 		default:
-			out += fmt.Sprintf("%c%s", part.Operator, part.Name)
+			out += fmt.Sprintf("%s%s", part.Operator, part.Name)
 		}
 	}
 	return out
+}
+
+func (selector Selector) String() string {
+	return selector.Render(false)
 }
