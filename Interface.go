@@ -24,14 +24,6 @@ func FromCodeTree(tree *codetree.CodeTree) *Compiler {
 	compiler.rules, compiler.mediaGroups, compiler.mediaQueries, compiler.animations =
 		compileChildren(tree, nil, compiler.state)
 
-	compiler.rules = combineDuplicates(compiler.rules)
-	for _, group := range compiler.mediaGroups {
-		group.Rules = combineDuplicates(group.Rules)
-	}
-	for _, query := range compiler.mediaQueries {
-		query.Rules = combineDuplicates(query.Rules)
-	}
-
 	return compiler
 }
 
@@ -97,6 +89,28 @@ func (compiler *Compiler) Render(pretty bool) (string, error) {
 	}
 
 	return strings.TrimRight(output.String(), "\n"), nil
+}
+
+// CombineDuplicates compresses the output CSS by combining duplicate rule definitions
+//Example:
+// a { color: blue; }
+// p { color: blue; }
+// becomes:
+// a, p { color: blue; }
+// Combining duplicate rules is a potentially lossy operation.
+// Excepting prior knowledge of the HTML; selectors with differing, rightmost element keys and some cases of
+// mutually exclusive attribute or pseudo selectors; it's impossible to tell which selectors may overlap and apply to
+// the same element. The hoisting of rules that often occurs when combining can alter the order that styles are applied
+// and therefor the outcome. It is not currently possible for Scarlet to determine which rules may be losslessly
+// combined.
+func (compiler *Compiler) CombineDuplicates() {
+	compiler.rules = combineDuplicates(compiler.rules)
+	for _, group := range compiler.mediaGroups {
+		group.Rules = combineDuplicates(group.Rules)
+	}
+	for _, query := range compiler.mediaQueries {
+		query.Rules = combineDuplicates(query.Rules)
+	}
 }
 
 // FilterTags removes all tag representations from a Compiler not mentioned in tags.
