@@ -1,7 +1,5 @@
 package scarlet
 
-import "strings"
-
 // Force interface implementation
 var _ Renderable = (*MediaGroup)(nil)
 
@@ -14,50 +12,50 @@ type MediaGroup struct {
 }
 
 // Render renders the media group to the output stream.
-func (media *MediaGroup) Render(output *strings.Builder, pretty bool) {
+func (media *MediaGroup) Render(output Builder, pretty bool) {
 	if len(media.Rules) == 0 {
 		return
 	}
 
-	output.WriteString("@media all and (")
+	_, _ = output.WriteString("@media all and (")
 
 	switch media.Operator {
 	case "<":
-		output.WriteString("max")
+		_, _ = output.WriteString("max")
 	case ">":
-		output.WriteString("min")
+		_, _ = output.WriteString("min")
 	default:
 		panic("Invalid screen size operator in media query")
 	}
 
-	output.WriteByte('-')
-	output.WriteString(media.Property)
-	output.WriteByte(':')
+	_ = output.WriteByte('-')
+	_, _ = output.WriteString(media.Property)
+	_ = output.WriteByte(':')
 
 	if pretty {
-		output.WriteByte(' ')
+		_ = output.WriteByte(' ')
 	}
 
-	output.WriteString(media.Size)
-	output.WriteByte(')')
+	_, _ = output.WriteString(media.Size)
+	_ = output.WriteByte(')')
 
 	if pretty {
-		output.WriteByte(' ')
+		_ = output.WriteByte(' ')
 	}
 
-	output.WriteByte('{')
+	_ = output.WriteByte('{')
 
 	if pretty {
-		output.WriteByte('\n')
+		_ = output.WriteByte('\n')
 	}
 
 	for _, rule := range media.Rules {
 		rule.Render(output, pretty)
 	}
 
-	output.WriteByte('}')
+	_ = output.WriteByte('}')
 
 	if pretty {
-		output.WriteByte('\n')
+		_ = output.WriteByte('\n')
 	}
 }

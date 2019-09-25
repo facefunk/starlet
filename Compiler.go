@@ -47,7 +47,10 @@ func compileChildren(node *codetree.CodeTree, parent *CSSRule, state *State) (
 
 			// Selector on previous line
 			if strings.HasSuffix(child.Line, ",") {
-				selectors := parseSelector(child.Line[:len(child.Line)-1]).Split()
+				name := child.Line[:len(child.Line)-1]
+				selector := parseSelector(name)
+				selector.SetMapping(child.GetFilename(), child.LineNumber, name)
+				selectors := selector.Split()
 				selectorsOnPreviousLines = append(selectorsOnPreviousLines, selectors...)
 				continue
 			}
@@ -72,6 +75,7 @@ func compileChildren(node *codetree.CodeTree, parent *CSSRule, state *State) (
 			} else if parent != nil && strings.IndexByte(child.Line, ' ') != -1 {
 				// Statements
 				statement := compileStatement(child.Line, state)
+				statement.SetMapping(child.GetFilename(), child.LineNumber, child.Line)
 				parent.Statements = append(parent.Statements, statement)
 			} else {
 				// Mixin calls
@@ -149,7 +153,9 @@ func compileChildren(node *codetree.CodeTree, parent *CSSRule, state *State) (
 			continue
 		}
 
-		selectors := parseSelector(child.Line).Split()
+		selector := parseSelector(child.Line)
+		selector.SetMapping(child.GetFilename(), child.LineNumber, child.Line)
+		selectors := selector.Split()
 
 		// Append selectors from previous lines
 		selectors = append(selectorsOnPreviousLines, selectors...)

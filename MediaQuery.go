@@ -1,7 +1,5 @@
 package scarlet
 
-import "strings"
-
 // Force interface implementation
 var _ Renderable = (*MediaQuery)(nil)
 
@@ -12,30 +10,30 @@ type MediaQuery struct {
 }
 
 // Render renders the media query to the output stream.
-func (media *MediaQuery) Render(output *strings.Builder, pretty bool) {
+func (media *MediaQuery) Render(output Builder, pretty bool) {
 	if len(media.Rules) == 0 {
 		return
 	}
 
-	output.WriteString(media.Selector)
+	_, _ = output.WriteString(media.Selector)
 
 	if pretty {
-		output.WriteByte(' ')
+		_ = output.WriteByte(' ')
 	}
 
-	output.WriteByte('{')
+	_ = output.WriteByte('{')
 
 	if pretty {
-		output.WriteByte('\n')
+		_ = output.WriteByte('\n')
 	}
 
 	for _, rule := range media.Rules {
 		rule.Render(output, pretty)
 	}
 
-	output.WriteByte('}')
+	_ = output.WriteByte('}')
 
 	if pretty {
-		output.WriteByte('\n')
+		_ = output.WriteByte('\n')
 	}
 }

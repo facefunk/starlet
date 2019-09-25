@@ -7,6 +7,7 @@ require (
 	github.com/aerogo/codetree v1.0.3
 	github.com/akyoto/color v1.8.2
 	github.com/lucasb-eyer/go-colorful v1.0.2
+	github.com/neelance/sourcemap v0.0.0-20151028013722-8c68805598ab
 	golang.org/x/sys v0.0.0-20190429190828-d89cdac9e872 // indirect
 )
 

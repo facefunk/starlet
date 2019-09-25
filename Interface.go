@@ -28,67 +28,65 @@ func FromCodeTree(tree *codetree.CodeTree) *Compiler {
 }
 
 // Render returns a CSS string with pretty or compressed formatting, depending on the argument pretty.
-func (compiler *Compiler) Render(pretty bool) (string, error) {
-	output := strings.Builder{}
+func (compiler *Compiler) Render(builder Builder, pretty bool) {
+
 	// CSS variables
 	if len(compiler.state.Variables) > 0 {
 		if pretty {
-			output.WriteString(":root {\n")
+			_, _ = builder.WriteString(":root {\n")
 		} else {
-			output.WriteString(":root{")
+			_, _ = builder.WriteString(":root{")
 		}
 
 		for _, name := range compiler.state.VariableNames {
 			value := compiler.state.Variables[name]
 
 			if pretty {
-				output.WriteString("\t")
+				_ = builder.WriteByte('\t')
 			}
 
-			output.WriteString("--")
-			output.WriteString(name)
-			output.WriteByte(':')
+			_, _ = builder.WriteString("--")
+			_, _ = builder.WriteString(name)
+			_ = builder.WriteByte(':')
 
 			if pretty {
-				output.WriteString(" ")
+				_ = builder.WriteByte(' ')
 			}
 
-			output.WriteString(value)
-			output.WriteByte(';')
+			_, _ = builder.WriteString(value)
+			_ = builder.WriteByte(';')
 
 			if pretty {
-				output.WriteString("\n")
+				_ = builder.WriteByte('\n')
 			}
 		}
 
-		output.WriteString("}")
+		_ = builder.WriteByte('}')
 
 		if pretty {
-			output.WriteString("\n\n")
+			_, _ = builder.WriteString("\n\n")
 		}
 	}
 
 	// Render rules
 	for _, rule := range compiler.rules {
-		rule.Render(&output, pretty)
+		rule.Render(builder, pretty)
 	}
 
 	// Render animations
 	for _, animation := range compiler.animations {
-		animation.Render(&output, pretty)
+		animation.Render(builder, pretty)
 	}
 
 	// Render media groups
 	for _, mediaGroup := range compiler.mediaGroups {
-		mediaGroup.Render(&output, pretty)
+		mediaGroup.Render(builder, pretty)
 	}
 
 	// Render media queries
 	for _, mediaQuery := range compiler.mediaQueries {
-		mediaQuery.Render(&output, pretty)
+		mediaQuery.Render(builder, pretty)
 	}
-
-	return strings.TrimRight(output.String(), "\n"), nil
 }
 
 // CombineDuplicates compresses the output CSS by combining duplicate rule definitions
@@ -147,5 +145,7 @@ func Compile(src string, pretty bool) (string, error) {
 	}
 	compiler := FromCodeTree(tree)
 	tree.Close()
-	return compiler.Render(pretty)
+	builder := &strings.Builder{}
+	compiler.Render(builder, pretty)
+	return strings.TrimRight(builder.String(), "\n"), nil
 }

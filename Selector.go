@@ -17,9 +17,12 @@ const (
 type (
 	Selector     []SelectorPart
 	SelectorPart struct {
-		Name     string
-		Type     int
-		Operator string
+		Name         string
+		Type         int
+		Operator     string
+		OriginalFile string
+		OriginalLine int
+		OriginalName string
 	}
 )
 
@@ -130,6 +133,15 @@ func parseSelector(selector string) Selector {
 	}
 	add()
 	return parts
+}
+
+// SetMapping sets the original scarlet file mapping information for this Selector.
+func (selector Selector) SetMapping(file string, line int, name string) {
+	for p := range selector {
+		selector[p].OriginalFile = file
+		selector[p].OriginalLine = line
+		selector[p].OriginalName = name
+	}
 }
 
 func (selector Selector) Prepend(parent Selector) (Selector, error) {

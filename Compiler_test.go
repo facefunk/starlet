@@ -70,7 +70,9 @@ func TestCompilerFilterTags(t *testing.T) {
 		t.Fatal(err)
 		return
 	}
-	css, err := scarlet.FromCodeTree(tree).FilterTags(tags).Render(false)
+	builder := &strings.Builder{}
+	scarlet.FromCodeTree(tree).FilterTags(tags).Render(builder, false)
+	css := builder.String()
 	if err != nil {
 		t.Fatalf("Error compiling:%s", err)
 		return

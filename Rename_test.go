@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/aerogo/codetree"
@@ -20,11 +21,9 @@ func TestRename(t *testing.T) {
 
 	compiler := FromCodeTree(tree)
 	renamingMap := compiler.RenameClasses()
-	css, err := compiler.Render(false)
-	if err != nil {
-		t.Errorf("Error compiling:%s", err)
-		return
-	}
+	builder := &strings.Builder{}
+	compiler.Render(builder, false)
+	css := builder.String()
 
 	wantedMap := &RenamingMap{
 		Map: map[string]string{

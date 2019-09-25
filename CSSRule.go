@@ -20,63 +20,72 @@ type CSSRule struct {
 }
 
 // Render renders the CSS rule into the output stream.
-func (rule *CSSRule) Render(output *strings.Builder, pretty bool) {
+func (rule *CSSRule) Render(output Builder, pretty bool) {
 	if len(rule.Statements) == 0 {
 		return
 	}
 
-	output.WriteString(strings.TrimSpace(rule.SelectorPath(pretty)))
+	if mapper, ok := output.(*MappingBuilder); ok {
+		last := rule.Selector[len(rule.Selector)-1]
+		mapper.AddMapping(last.OriginalFile, last.OriginalLine, last.OriginalName)
+	}
+
+	_, _ = output.WriteString(rule.SelectorPath(pretty))
 
 	if len(rule.Duplicates) > 0 {
 		for _, duplicate := range rule.Duplicates {
-			output.WriteString(",")
+			_ = output.WriteByte(',')
 
 			if pretty {
-				output.WriteString(" ")
+				_ = output.WriteByte(' ')
 			}
 
-			output.WriteString(strings.TrimSpace(duplicate.SelectorPath(pretty)))
+			_, _ = output.WriteString(duplicate.SelectorPath(pretty))
 		}
 	}
 
 	if pretty {
-		output.WriteString(" ")
+		_ = output.WriteByte(' ')
 	}
 
-	output.WriteString("{")
+	_ = output.WriteByte('{')
 
 	if pretty {
-		output.WriteString("\n")
+		_ = output.WriteByte('\n')
 	}
 
 	for index, statement := range rule.Statements {
 		if pretty {
-			output.WriteString("\t")
+			_ = output.WriteByte('\t')
 		}
 
-		output.WriteString(statement.Property)
-		output.WriteString(":")
+		if mapper, ok := output.(*MappingBuilder); ok {
+			mapper.AddMapping(statement.OriginalFile, statement.OriginalLine, statement.OriginalName)
+		}
+
+		_, _ = output.WriteString(statement.Property)
+		_ = output.WriteByte(':')
 
 		if pretty {
-			output.WriteString(" ")
+			_ = output.WriteByte(' ')
 		}
 
-		output.WriteString(statement.Value)
+		_, _ = output.WriteString(statement.Value)
 
 		// Remove last semicolon
 		if pretty || index != len(rule.Statements)-1 {
-			output.WriteString(";")
+			_ = output.WriteByte(';')
 		}
 
 		if pretty {
-			output.WriteString("\n")
+			_ = output.WriteByte('\n')
 		}
 	}
 
-	output.WriteString("}")
+	_ = output.WriteByte('}')
 
 	if pretty {
-		output.WriteString("\n\n")
+		_, _ = output.WriteString("\n\n")
 	}
 }
 
@@ -106,7 +115,7 @@ func (rule *CSSRule) Copy() *CSSRule {
 
 // SelectorPath returns the selector string for the rule (recursive, returns absolute path).
 func (rule *CSSRule) SelectorPath(pretty bool) string {
-	return rule.Selector.Render(pretty)
+	return strings.TrimSpace(rule.Selector.Render(pretty))
 }
 
 // StatementsHash returns a hash of all the statements which is used to find duplicate CSS rules.

@@ -1,7 +1,5 @@
 package scarlet
 
-import "strings"
-
 // Force interface implementation
 var _ Renderable = (*Animation)(nil)
 
@@ -12,27 +10,27 @@ type Animation struct {
 }
 
 // Render renders the animation to the output stream.
-func (anim *Animation) Render(output *strings.Builder, pretty bool) {
-	output.WriteString("@keyframes ")
-	output.WriteString(anim.Name)
+func (anim *Animation) Render(output Builder, pretty bool) {
+	_, _ = output.WriteString("@keyframes ")
+	_, _ = output.WriteString(anim.Name)
 
 	if pretty {
-		output.WriteByte(' ')
+		_ = output.WriteByte(' ')
 	}
 
-	output.WriteByte('{')
+	_ = output.WriteByte('{')
 
 	if pretty {
-		output.WriteByte('\n')
+		_ = output.WriteByte('\n')
 	}
 
 	for _, keyframe := range anim.Keyframes {
 		keyframe.Render(output, pretty)
 	}
 
-	output.WriteByte('}')
+	_ = output.WriteByte('}')
 
 	if pretty {
-		output.WriteByte('\n')
+		_ = output.WriteByte('\n')
 	}
 }
