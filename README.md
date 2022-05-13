@@ -5,6 +5,7 @@
 [![Reference][godoc-img]][godoc-url]
 [![Report][report-img]][report-url]
 [![Tests][tests-img]][tests-url]
+![Test Coverage][cover-img]
 [![License][license-img]][license-url]
 
 Generates CSS from `.strlt` files. Very similar to Stylus, but with higher compression.
@@ -127,5 +128,6 @@ body
 [report-url]: https://goreportcard.com/report/github.com/facefunk/starlet
 [tests-img]: https://github.com/facefunk/starlet/actions/workflows/go.yml/badge.svg
 [tests-url]: https://github.com/facefunk/starlet/actions/workflows/go.yml
+[cover-img]: https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/facefunk/c5b87cdf38d8d642e841ce4ca79e31fa/raw/starlet__heads_master.json
 [license-img]: https://img.shields.io/badge/license-MIT-blue.svg
 [license-url]: https://github.com/facefunk/starlet/blob/master/LICENSE

@@ -24,3 +24,32 @@ jobs:
 
     - name: Test
       run: go test -v ./...
+
+    - name: Coverage
+      run: |
+        COVERAGE="$(go test -cover ./... | grep -Po '(?<=coverage: )[0-9.]+(?=% of statements)')"
+        REF=${{ github.ref }}
+        IFS='/' read -ra PATHS <<< "$REF"
+        BRANCH_NAME="${PATHS[1]}_${PATHS[2]}"
+
+        echo "COVERAGE=$COVERAGE" >> $GITHUB_ENV
+        echo "BRANCH=$BRANCH_NAME" >> $GITHUB_ENV
+
+        echo "coverage: $COVERAGE";
+        echo "github.ref: $REF"
+        echo "branch name: $BRANCH_NAME"
+
+    - name: Create the Badge
+      uses: schneegans/dynamic-badges-action@v1.3.0
+      with:
+        auth: ${{ secrets.GIST_SECRET }}
+        gistID: c5b87cdf38d8d642e841ce4ca79e31fa
+        filename: starlet__${{ env.BRANCH }}.json
+        label: Test Coverage
+        message: ${{ env.COVERAGE }}%
+        minColorRange: 0
+        maxColorRange: 100
+        valColorRange: ${{ env.COVERAGE }}
+        namedLogo: Go
+
+
