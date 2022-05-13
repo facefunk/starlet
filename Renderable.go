@@ -1,4 +1,4 @@
-package scarlet
+package starlet
 
 // Renderable represents anything that can be rendered into final output.
 type Renderable interface {

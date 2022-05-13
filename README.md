@@ -1,16 +1,16 @@
-# scarlet
+<img src="https://github.com/facefunk/starlet/blob/master/logo.svg" width="256" height="256" alt="starlet" title="startlet">
 
-[![Reference][godoc-image]][godoc-url]
-[![Report][report-image]][report-url]
-[![Tests][tests-image]][tests-url]
-[![Coverage][codecov-image]][codecov-url]
-[![License][license-image]][license-url]
+# starlet
 
-Generates CSS from `.scarlet` files. Very similar to Stylus, but with higher compression.
+[![Reference][godoc-img]][godoc-url]
+[![Report][report-img]][report-url]
+[![License][license-img]][license-url]
+
+Generates CSS from `.strlt` files. Very similar to Stylus, but with higher compression.
 
 ## Basic usage
 
-```scarlet
+```starlet
 body
 	color black
 	font-size 100%
@@ -19,7 +19,7 @@ body
 
 ## State
 
-```scarlet
+```starlet
 a
 	color blue
 
@@ -29,7 +29,7 @@ a
 
 ## Classes
 
-```scarlet
+```starlet
 a
 	color blue
 
@@ -44,7 +44,7 @@ a
 
 ## Multiple selectors
 
-```scarlet
+```starlet
 // All in one line
 h1, h2, h3
 	color orange
@@ -58,7 +58,7 @@ h6
 
 ## Variables
 
-```scarlet
+```starlet
 text-color = black
 transition-speed = 200ms
 
@@ -76,7 +76,7 @@ a
 
 ## Mixins
 
-```scarlet
+```starlet
 mixin horizontal
 	display flex
 	flex-direction row
@@ -88,14 +88,14 @@ mixin vertical
 
 Mixins can be used like this:
 
-```scarlet
+```starlet
 #sidebar
 	vertical
 ```
 
 ## Animations
 
-```scarlet
+```starlet
 animation rotate
 	0%
 		transform rotateZ(0)
@@ -111,7 +111,7 @@ animation pulse
 
 ## Quick media queries
 
-```scarlet
+```starlet
 body
 	vertical
 
@@ -120,19 +120,9 @@ body
 		horizontal
 ```
 
-## Author
-
-| [![Eduard Urbach on Twitter](https://gravatar.com/avatar/16ed4d41a5f244d1b10de1b791657989?s=70)](https://twitter.com/eduardurbach "Follow @eduardurbach on Twitter") |
-|---|
-| [Eduard Urbach](https://eduardurbach.com) |
-
-[godoc-image]: https://godoc.org/github.com/aerogo/scarlet?status.svg
-[godoc-url]: https://godoc.org/github.com/aerogo/scarlet
-[report-image]: https://goreportcard.com/badge/github.com/aerogo/scarlet
-[report-url]: https://goreportcard.com/report/github.com/aerogo/scarlet
-[tests-image]: https://cloud.drone.io/api/badges/aerogo/scarlet/status.svg
-[tests-url]: https://cloud.drone.io/aerogo/scarlet
-[codecov-image]: https://codecov.io/gh/aerogo/scarlet/graph/badge.svg
-[codecov-url]: https://codecov.io/gh/aerogo/scarlet
-[license-image]: https://img.shields.io/badge/license-MIT-blue.svg
-[license-url]: https://github.com/aerogo/scarlet/blob/master/LICENSE
+[godoc-img]: https://godoc.org/github.com/facefunk/starlet?status.svg
+[godoc-url]: https://godoc.org/github.com/facefunk/starlet
+[report-img]: https://goreportcard.com/badge/github.com/facefunk/starlet
+[report-url]: https://goreportcard.com/report/github.com/facefunk/starlet
+[license-img]: https://img.shields.io/badge/license-MIT-blue.svg
+[license-url]: https://github.com/facefunk/starlet/blob/master/LICENSE

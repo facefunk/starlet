@@ -1,4 +1,4 @@
-package scarlet
+package starlet
 
 // combineDuplicates combines duplicate CSS statements into one.
 // Example:

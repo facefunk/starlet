@@ -1,4 +1,4 @@
-package scarlet
+package starlet
 
 import "fmt"
 
@@ -135,7 +135,7 @@ func parseSelector(selector string) Selector {
 	return parts
 }
 
-// SetMapping sets the original scarlet file mapping information for this Selector.
+// SetMapping sets the original starlet file mapping information for this Selector.
 func (selector Selector) SetMapping(file string, line int, name string) {
 	for p := range selector {
 		selector[p].OriginalFile = file

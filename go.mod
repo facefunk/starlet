@@ -1,4 +1,4 @@
-module github.com/aerogo/scarlet
+module github.com/facefunk/starlet
 
 go 1.12
 

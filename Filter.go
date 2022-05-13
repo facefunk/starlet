@@ -1,4 +1,4 @@
-package scarlet
+package starlet
 
 func filterTags(rules []*CSSRule, tags []string) []*CSSRule {
 	if len(tags) == 0 {

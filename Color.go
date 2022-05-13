@@ -1,4 +1,4 @@
-package scarlet
+package starlet
 
 import (
 	"regexp"

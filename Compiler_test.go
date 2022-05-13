@@ -1,4 +1,4 @@
-package scarlet_test
+package starlet_test
 
 import (
 	"fmt"
@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/aerogo/codetree"
-	"github.com/aerogo/scarlet"
 	"github.com/akyoto/color"
+	"github.com/facefunk/starlet"
 )
 
 func testFile(t *testing.T, filePath string, result string) {
@@ -18,7 +18,7 @@ func testFile(t *testing.T, filePath string, result string) {
 	code := string(src)
 
 	start := time.Now()
-	css, _ := scarlet.Compile(code, false)
+	css, _ := starlet.Compile(code, false)
 	elapsed := time.Since(start)
 
 	fmt.Println(css)
@@ -34,15 +34,15 @@ func testFile(t *testing.T, filePath string, result string) {
 }
 
 func TestCompiler1(t *testing.T) {
-	testFile(t, "testdata/test.scarlet", `a{color:black}a :hover{color:blue}a :hover div{color:red}p :hover{color:blue}p :hover div{color:red}@keyframes appear{0%{opacity:0}100%{opacity:1}}@media all and (min-width:900px){p{display:flex;animation-name:appear}}`)
+	testFile(t, "testdata/test.strlt", `a{color:black}a :hover{color:blue}a :hover div{color:red}p :hover{color:blue}p :hover div{color:red}@keyframes appear{0%{opacity:0}100%{opacity:1}}@media all and (min-width:900px){p{display:flex;animation-name:appear}}`)
 }
 
 func TestCompiler2(t *testing.T) {
-	testFile(t, "testdata/test2.scarlet", `:root{--text-color:blue;--text-hover-color:var(--text-color);--gradient:linear-gradient(to bottom,0% var(--text-color),100% var(--text-color));}body{display:flex;flex-direction:row;color:var(--text-color);background-color:#202020}p{display:flex;flex-direction:row;color:blue;background-color:#202020}a{color:red}a :hover{color:var(--text-hover-color)}a :hover div{width:100%}a :hover div img{height:100%}a :active{color:blue}#content{color:red}#content :hover{color:red}#content >div{color:orange}#content img{border:none}#content [aria-class="button"]{color:green}div :hover{color:white}div span{display:none}div address{display:none}p :hover{color:white}p span{display:none}p address{display:none}h1{display:none}h2{display:none}@media all and (min-height: 320px){body{background-color:red}}`)
+	testFile(t, "testdata/test2.strlt", `:root{--text-color:blue;--text-hover-color:var(--text-color);--gradient:linear-gradient(to bottom,0% var(--text-color),100% var(--text-color));}body{display:flex;flex-direction:row;color:var(--text-color);background-color:#202020}p{display:flex;flex-direction:row;color:blue;background-color:#202020}a{color:red}a :hover{color:var(--text-hover-color)}a :hover div{width:100%}a :hover div img{height:100%}a :active{color:blue}#content{color:red}#content :hover{color:red}#content >div{color:orange}#content img{border:none}#content [aria-class="button"]{color:green}div :hover{color:white}div span{display:none}div address{display:none}p :hover{color:white}p span{display:none}p address{display:none}h1{display:none}h2{display:none}@media all and (min-height: 320px){body{background-color:red}}`)
 }
 
 func BenchmarkCompiler(b *testing.B) {
-	src, _ := ioutil.ReadFile("testdata/test.scarlet")
+	src, _ := ioutil.ReadFile("testdata/test.strlt")
 	code := string(src)
 
 	b.ReportAllocs()
@@ -50,7 +50,7 @@ func BenchmarkCompiler(b *testing.B) {
 
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
-			_, err := scarlet.Compile(code, false)
+			_, err := starlet.Compile(code, false)
 
 			if err != nil {
 				b.Fail()
@@ -63,7 +63,7 @@ func TestCompilerFilterTags(t *testing.T) {
 	tags := []string{"a", "b", "body", "br", "button", "div", "fieldset", "footer", "form", "h1", "h2", "head",
 		"header", "html", "iframe", "input", "legend", "li", "link", "meta", "noscript", "ol", "p", "pre", "script",
 		"span", "string", "style", "table", "textarea", "title", "ul"}
-	reader, _ := os.Open("testdata/normalize.scarlet")
+	reader, _ := os.Open("testdata/normalize.strlt")
 	tree, err := codetree.FromReader(reader)
 	defer reader.Close()
 	if err != nil {
@@ -71,7 +71,7 @@ func TestCompilerFilterTags(t *testing.T) {
 		return
 	}
 	builder := &strings.Builder{}
-	scarlet.FromCodeTree(tree).FilterTags(tags).Render(builder, false)
+	starlet.FromCodeTree(tree).FilterTags(tags).Render(builder, false)
 	css := builder.String()
 	if err != nil {
 		t.Fatalf("Error compiling:%s", err)

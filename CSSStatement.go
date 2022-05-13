@@ -1,4 +1,4 @@
-package scarlet
+package starlet
 
 // CSSStatement ...
 type CSSStatement struct {
@@ -9,7 +9,7 @@ type CSSStatement struct {
 	OriginalName string
 }
 
-// SetMapping sets the original scarlet file mapping information for this CSSStatement.
+// SetMapping sets the original starlet file mapping information for this CSSStatement.
 func (statement *CSSStatement) SetMapping(file string, line int, name string) {
 	statement.OriginalFile = file
 	statement.OriginalLine = line

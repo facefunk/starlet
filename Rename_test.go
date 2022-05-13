@@ -1,4 +1,4 @@
-package scarlet
+package starlet
 
 import (
 	"fmt"
@@ -11,7 +11,7 @@ import (
 )
 
 func TestRename(t *testing.T) {
-	reader, _ := os.Open("testdata/classes.scarlet")
+	reader, _ := os.Open("testdata/classes.strlt")
 	tree, err := codetree.FromReader(reader)
 	defer reader.Close()
 	if err != nil {

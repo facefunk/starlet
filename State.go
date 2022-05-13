@@ -1,4 +1,4 @@
-package scarlet
+package starlet
 
 // State represents the whole compiler state.
 type State struct {

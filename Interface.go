@@ -1,4 +1,4 @@
-package scarlet
+package starlet
 
 import (
 	"strings"
@@ -137,7 +137,7 @@ func (compiler *Compiler) RenameClasses() *RenamingMap {
 	return renamingMap
 }
 
-// Compile compiles the given scarlet code to a CSS string.
+// Compile compiles the given starlet code to a CSS string.
 func Compile(src string, pretty bool) (string, error) {
 	tree, err := codetree.New(src)
 	if err != nil {

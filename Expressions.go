@@ -1,4 +1,4 @@
-package scarlet
+package starlet
 
 type ignoreReader struct {
 	inString          bool

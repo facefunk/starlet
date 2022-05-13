@@ -1,0 +1,15 @@
+mixin abstract1
+  margin 10px
+  font-size 90%
+
+mixin abstract2
+  abstract1
+  margin 12px
+
+.class1
+  abstract2
+  color red
+
+.class2
+  abstract2
+  color blue

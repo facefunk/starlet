@@ -21,7 +21,7 @@ var (
 
 // Shell flags
 func init() {
-	flag.BoolVar(&check, "check", false, "Checks all scarlet classes and tests whether they are referenced in .ts or .go files")
+	flag.BoolVar(&check, "check", false, "Checks all starlet classes and tests whether they are referenced in .ts or .go files")
 	flag.Parse()
 }
 
@@ -44,7 +44,7 @@ func checkDirectory(dir string) {
 			return nil
 		}
 
-		if strings.HasSuffix(file, ".scarlet") {
+		if strings.HasSuffix(file, ".strlt") {
 			wg.Add(1)
 
 			go func() {

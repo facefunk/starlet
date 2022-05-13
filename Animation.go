@@ -1,4 +1,4 @@
-package scarlet
+package starlet
 
 // Force interface implementation
 var _ Renderable = (*Animation)(nil)

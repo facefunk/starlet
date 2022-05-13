@@ -1,4 +1,4 @@
-package scarlet
+package starlet
 
 // Mixin is a collection of CSS rules.
 type Mixin struct {
