@@ -27,23 +27,33 @@ jobs:
 
     - name: Coverage
       run: |
-        COVERAGE="$(go test -cover ./... | grep -Po '(?<=coverage: )[0-9.]+(?=% of statements)')"
+        COVERAGE="$(go test -covermode=count -coverprofile=cover.out ./... \
+          | grep -Po '(?<=coverage: )[0-9.]+(?=% of statements)')"
         REF=${{ github.ref }}
         IFS='/' read -ra PATHS <<< "$REF"
-        BRANCH_NAME="${PATHS[1]}_${PATHS[2]}"
+        BRANCH="${PATHS[1]}_${PATHS[2]}"
 
         echo "COVERAGE=$COVERAGE" >> $GITHUB_ENV
-        echo "BRANCH=$BRANCH_NAME" >> $GITHUB_ENV
+        echo "BRANCH=$BRANCH" >> $GITHUB_ENV
 
         echo "coverage: $COVERAGE";
         echo "github.ref: $REF"
-        echo "branch name: $BRANCH_NAME"
+        echo "branch: $BRANCH"
 
-    - name: Create the Badge
+        go tool cover -html=cover.out -o cover.html
+
+        curl \
+          -X PATCH \
+          -H "Authorization: bearer ${{ secrets.GIST_SECRET }}" \
+          -H "Accept: application/vnd.github.v3+json" \
+          -d "{\"files\":{\"starlet__$BRANCH.html\":{\"content\":$(jq -Rs . < cover.html)}}}" \
+          https://api.github.com/gists/dab69a116cf1a97577a1194a1e67ab55
+
+    - name: Create coverage badge
       uses: schneegans/dynamic-badges-action@v1.3.0
       with:
         auth: ${{ secrets.GIST_SECRET }}
-        gistID: c5b87cdf38d8d642e841ce4ca79e31fa
+        gistID: dab69a116cf1a97577a1194a1e67ab55
         filename: starlet__${{ env.BRANCH }}.json
         label: Test Coverage
         message: ${{ env.COVERAGE }}%
@@ -51,5 +61,3 @@ jobs:
         maxColorRange: 100
         valColorRange: ${{ env.COVERAGE }}
         namedLogo: Go
-
-
